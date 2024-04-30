@@ -27,10 +27,6 @@ if date_perso:
     exc11, exc12 = exc1.columns(2)
     start_day  = exc11.text_input("Date de Départ", "01/01")
     end_day = exc12.text_input("Date de Fin", "31/12")
-    # start_day = exc11.number_input('Start Day', min_value=1, max_value=31, value=1)
-    # start_month = exc12.number_input('Start Month', min_value=1, max_value=12, value=1)
-    # end_day = exc11.number_input('End Day', min_value=1, max_value=31, value=1)
-    # end_month = exc12.number_input('End Month', min_value=1, max_value=12, value=1)
 
 if ind == "Température Seuil":
     nb_jour_cons = col12.number_input("Séléctionner un nombre de jour consécutif",1,365)
