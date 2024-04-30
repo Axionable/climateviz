@@ -43,12 +43,10 @@ if ind == "Température Seuil":
     #mf
     df_2 = pd.read_csv("data/Serie_tempo_T_montpellier_daily_1959_2024.csv")
     fig = uh.main_indic(df, df_2, indicateur="Nb_jours_max", seuil=seuil,  periode_start=start_day, periode_end=end_day, dict_indicateurs=dict_indicateurs, signe=signe)
-
-
+    st.plotly_chart(fig)
 
 if (ind=="Température Max" and commune=="Montpellier" and end_day=="30/09"):
     df_drias_ind = pd.read_csv("data/test_plot.csv")
-    #df = uh.filtre_temporel_periode(df, "01-07", "30-09")
     fig = uh.plot_climate_strips(df_drias_ind, "T_MAX", "01/07", "30/09",dict_indicateurs)
 
     st.plotly_chart(fig, width=2000)

@@ -152,6 +152,7 @@ def plot_climate_strips_tania(
     start_year_ref,
     end_year_ref,
 ):
+    # a modifier les données en DUR @lucas
     fig = go.Figure()
 
     fig.add_bar(
@@ -209,7 +210,7 @@ def plot_climate_strips_tania(
     return fig
 
 
-def moyenne_T_Q(df, indic):
+def calcul_val_reference(df, indic):
     df_periode = df[(df["Année"] >= 1951) & (df["Année"] <= 1980)]
 
     moyenne = df_periode[indic].mean()
@@ -217,12 +218,12 @@ def moyenne_T_Q(df, indic):
     return moyenne
 
 
-def calc_relatif_value(df, indicateur, moyenne_ref):
+def calcule_anomalie(df, indicateur, moyenne_ref):
     df["ANOM_" + indicateur] = df[indicateur] - moyenne_ref
     return df
 
 
-def main_indic(
+def main_indic_nb_jour_consecutif(
     df_mf,
     df_drias,
     indicateur,
@@ -235,31 +236,48 @@ def main_indic(
     # df = filtre_temporel_periode(df, periode_start, periode_end)
     # df_2 = calc_nb_j(df, seuil, signe)
     # moy_ref = moyenne_T_Q(df_2, indicateur)
-    # df_2 = calc_relatif_value(df_2, indicateur, moy_ref)
+    # df_2 = calcule_anomalie(df_2, indicateur, moy_ref)
     # fig = plot_climate_strips(df_2, indicateur, periode_start, periode_end, dict_indicateurs, moy_ref)
 
-    df = filtre_temporel_periode(df_mf, periode_start, periode_end)
-    df_drias = filtre_temporel_periode(df_drias, periode_start, periode_end)
+    # filtre temporel
+    df_mf_filtre = filtre_temporel_periode(df_mf, periode_start, periode_end)
+    df_drias_filtre = filtre_temporel_periode(df_drias, periode_start, periode_end)
 
-    df_mf = calc_nb_j(df_mf, seuil, signe)
-    moy_ref = moyenne_T_Q(df_mf, indicateur)
-    df_mf = calc_relatif_value(df_mf, indicateur, moy_ref)
+    # filtre  et calcul nb jour sur MF
+    df_mf_nb_jour = calc_nb_j(df_mf_filtre, seuil, signe)
+    val_ref = calcul_val_reference(df_mf_nb_jour, indicateur)
+    print(df_mf_nb_jour.head(5))
+    df_mf_nb_jour = calcule_anomalie(df_mf_nb_jour, indicateur, val_ref)
 
-    df_drias = calc_nb_j(df_drias, seuil, signe)
-    moy_ref_drias = moyenne_T_Q(df_drias, indicateur)
-    df_drias = calc_relatif_value(df_drias, indicateur, moy_ref_drias)
-    df_drias["rolling_avg"] = df_drias[indicateur].rolling(window=30).mean() - 15
-    df_drias["rolling_std"] = df_drias[indicateur].rolling(window=30).std()
-    df_drias["avg + std"] = df_drias["rolling_avg"] + df_drias["rolling_std"]
-    df_drias["avg - std"] = df_drias["rolling_avg"] - df_drias["rolling_std"]
+    # fitlre et calcul sur DRIAS
+    df_drias_nb_jour = calc_nb_j(df_drias_filtre, seuil, signe)
+    val_ref_drias = calcul_val_reference(df_drias_nb_jour, indicateur)
+    print(df_drias_nb_jour.head(5))
+    df_drias_nb_jour = calcule_anomalie(df_drias_nb_jour, indicateur, val_ref_drias)
+
+    # Annomalie et rolling average sur DRIAS
+    df_drias_nb_jour["rolling_avg"] = (
+        df_drias_nb_jour[indicateur].rolling(window=30).mean() - 15
+    )
+    df_drias_nb_jour["rolling_std"] = (
+        df_drias_nb_jour[indicateur].rolling(window=30).std()
+    )
+    df_drias_nb_jour["avg + std"] = (
+        df_drias_nb_jour["rolling_avg"] + df_drias_nb_jour["rolling_std"]
+    )
+    df_drias_nb_jour["avg - std"] = (
+        df_drias_nb_jour["rolling_avg"] - df_drias_nb_jour["rolling_std"]
+    )
+    print(df_mf_nb_jour.head(5))
+    # Trace
     fig = plot_climate_strips_tania(
-        df_mf,
-        df_drias,
+        df_mf_nb_jour,
+        df_drias_nb_jour,
         indicateur,
         periode_start,
         periode_end,
         dict_indicateurs,
-        moy_ref,
+        val_ref,
         1951,
         1980,
     )
