@@ -4,16 +4,14 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
-st.title("Hello Météo-France , bienvenue sur Climate Viz")
+st.title("Hello Météo-France, bienvenue sur Climate Viz")
 dict_indicateurs = {"T_MAX": "Temperature maximale"}
 c1, c2 = st.columns(2)
 ctn = c1.expander("Paramètre")
 col11, col12 = ctn.columns(2)
 
-
+#definition des parametres initaux
 fig2 = uh.map_commune("Montpellier", [43.61361315241169], [3.875541887925083])
-
-
 end_day = False
 
 commune = col11.selectbox(
@@ -97,8 +95,8 @@ if ind == "Température Seuil":
     )
     st.plotly_chart(fig)
 
-    # Construction indicateurr temp moy, max, min
-
+# Construction indicateurr temp moy, max, min
+if ind in ["Température Max", "Température Moyenne", "Température Min"]:
     ind_dict = {
         "Température Max": "T_MAX",
         "Température Min": "T_MIN",
