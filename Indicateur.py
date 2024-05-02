@@ -17,14 +17,14 @@ fig2 = uh.map_commune("Montpellier", [43.61361315241169], [3.875541887925083])
 end_day = False
 
 commune = col11.selectbox(
-    "Choississez votre commune", ["Commune", "Marseille", "Montpellier", "Niort"]
+    "Choississez votre commune", ["Marseille", "Montpellier", "Niort"], index=None
 )
-if commune != "Commune":
+if commune:
     c2.plotly_chart(fig2)
 scenario = col12.selectbox(
-    "Scénario Climatique", ["Scénario", "RCP2.6", "RCP4.5", "RCP8.5"]
+    "Scénario Climatique", ["RCP2.6", "RCP4.5", "RCP8.5"], index=None
 )
-if scenario != "Scénario":
+if scenario:
     df_drias = pd.read_csv(f"data/drias_montpellier_{scenario}_df.csv")
     df_drias["T_Q"] = df_drias["T_Q"] - 273.15
 
@@ -32,18 +32,20 @@ if scenario != "Scénario":
 ind = col11.selectbox(
     "Choississez un indicateur",
     [
-        "Indicateur",
         "Température Max",
         "Température Moyenne",
         "Température Min",
         "Température Seuil",
+
     ],
+    index=None
 )
 date_perso = col11.checkbox("Date Personnalisée")
 
-# default
-periode_start = "01-01"
-periode_end = "12-31"
+# default date
+periode_start = "07-01"
+periode_end = "10-30"
+
 # selection date
 if date_perso:
     exc1 = c1.expander("Sélection Date Personnalisée")
@@ -54,9 +56,12 @@ if date_perso:
 
 # Temperature Seuil
 if ind == "Température Seuil":
-    seuil = col12.number_input("Séléctionner une température seuil (°C)", -10, 45)
+    seuil = col12.number_input(
+        "Séléctionner une température seuil (°C)", -10, 45, value=25
+    )
     choix_seuil = col12.radio(
-        "Choix seuil", ["Température Min", "Température Supérieur"]
+        "Choix seuil",
+        ["Température Supérieur", "Température Min"],
     )
 
     dict_indicateurs = {
@@ -102,28 +107,28 @@ if ind in ["Température Max", "Température Moyenne", "Température Min"]:
         df_mf=df_mf,
         df_drias=df_drias,
         indicateur=ind,
-        periode_start="01-07",
-        periode_end="10-30",
+        periode_start=periode_start,
+        periode_end=periode_end,
         dict_indicateurs=dict_indicateurs,
     )
     st.plotly_chart(fig)
 
-# metrique
-nb_1 = 5
-nb_2 = 8
-nb_3 = 11
+if commune and scenario and ind:
+    # metrique
+    metrique1995 = uh.prepa_df_metrique(df_drias, 1995, periode_start, periode_end, 25)
+    metrique2020 = uh.prepa_df_metrique(df_drias, 2030, periode_start, periode_end, 25)
+    metrique2050 = uh.prepa_df_metrique(df_drias, 2050, periode_start, periode_end, 25)
 
-if (ind == "Température Max") and end_day == "30/09":
     container = st.expander("Nb jour supérieur à 25°C", expanded=True)
     col1, col2, col3 = container.columns(3)
-    col1.metric("Horizon 1995", nb_1)
+    col1.metric("Horizon 1995", metrique1995)
     col2.metric(
         "Horizon 2020",
-        nb_2,
-        str(nb_2 - nb_1) + " jours par rapport à la période de référence",
+        metrique2020,
+        str(metrique2020 - metrique1995) + " jours supplémentaires",
     )
     col3.metric(
         "Horizon 2050",
-        nb_3,
-        str(nb_3 - nb_1) + " jours par rapport à la période de référence",
+        metrique2050,
+        str(metrique2050 - metrique1995) + " jours supplémentaires",
     )
