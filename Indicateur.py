@@ -36,9 +36,8 @@ ind = col11.selectbox(
         "Température Moyenne",
         "Température Min",
         "Température Seuil",
-
     ],
-    index=None
+    index=None,
 )
 date_perso = col11.checkbox("Date Personnalisée")
 
@@ -53,6 +52,12 @@ if date_perso:
     periode_start = exc11.text_input("Date de Départ", "07-01")
     periode_end = exc12.text_input("Date de Fin", "10-30")
 
+dict_indicateurs = {
+    "T_MAX": "Temperature maximale",
+    "T_MIN": "Température minimale",
+    "T_MOYENNE": "Température moyenne",
+    "nb_episodes": "Nombre d'épisodes",
+}
 
 # Temperature Seuil
 if ind == "Température Seuil":
@@ -71,8 +76,14 @@ if ind == "Température Seuil":
     }
     if choix_seuil == "Température Min":
         signe = "-"
+        dict_indicateurs[
+            "Nb_jours_max"
+        ] = f"Nombre de jours où la température est < à {seuil} °C "
     else:
         signe = "+"
+        dict_indicateurs[
+            "Nb_jours_max"
+        ] = f"Nombre de jours où la température est > à {seuil} °C "
 
     fig = uh.main_indic_nb_jour_consecutif(
         df_mf,
@@ -86,15 +97,7 @@ if ind == "Température Seuil":
     )
     st.plotly_chart(fig)
 
-# Construction indicateurr temp moy, max, min
-if ind in ["Température Max", "Température Moyenne", "Température Min"]:
-    dict_indicateurs = {
-        "T_MAX": "Temperature maximale",
-        "T_MIN": "Température minimale",
-        "T_MOYENNE": "Température moyenne",
-        "nb_episodes": "Nombre d'épisodes",
-        "Nb_jours_max": "Nombre de jours où la température est > à 25 °C ",
-    }
+    # Construction indicateurr temp moy, max, min
 
     ind_dict = {
         "Température Max": "T_MAX",

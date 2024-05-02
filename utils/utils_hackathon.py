@@ -156,7 +156,6 @@ def plot_climate_strip(
         line=dict(width=0),
         fill="tonexty",
         fillcolor="rgba(204, 204, 204, 0.2)",
-        fillcolor="rgba(204, 204, 204, 0.2)",
     )
     fig2.add_scatter(
         x=df_drias["Année"],
@@ -223,9 +222,7 @@ def main_indic_temperature(
     if indicateur == "T_MAX":
         temp_function = temp_max
     elif indicateur == "T_MIN":
-    elif indicateur == "T_MIN":
         temp_function = temp_min
-    elif indicateur == "T_MOYENNE":
     elif indicateur == "T_MOYENNE":
         temp_function = temp_moyenne
 
@@ -259,7 +256,6 @@ def main_indic_temperature(
         df_drias_temp_min["rolling_avg"] - df_drias_temp_min["rolling_std"]
     )
     # Trace
-    fig = plot_climate_strip(
     fig = plot_climate_strip(
         df_mf_temp_min,
         df_drias_temp_min,
