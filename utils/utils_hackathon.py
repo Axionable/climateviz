@@ -71,15 +71,24 @@ def apply_fct(df, func):
 
 
 def temp_max(df):
-    return df["T_Q"].max()
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].max().reset_index()
+    result.rename(columns={"T_Q": "T_MAX"}, inplace=True)
+    return result
 
 
 def temp_min(df):
-    return df["T_Q"].min()
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].min().reset_index()
+    result.rename(columns={"T_Q": "T_MIN"}, inplace=True)
+    return result
 
 
-def temp_moy(df):
-    return df["T_Q"].mean()
+def temp_moyenne(df):  
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].min().reset_index()
+    result.rename(columns={"T_Q": "T_MOYENNE"}, inplace=True)
+    return result
 
 
 def calc_nb_j(df, seuil, signe):
@@ -165,7 +174,7 @@ def plot_climate_strips_tania(
     fig.update_traces(hovertemplate="Année: %{x}<br>Anomalie: %{y:.1f}°")
 
     fig.update_layout(
-        title=f"{dict_indicateurs[indicateur]} entre le 01-07 et le 30-09.<br>Écart à la moyenne de référence 1951 à 1980",
+        title=f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}",
         xaxis_title="Année",
         yaxis_title="Anomalie (Nombre de jours)",
         width=1000,
@@ -192,6 +201,7 @@ def plot_climate_strips_tania(
         mode="lines",
         line=dict(width=0),
         fill="tonexty",
+        fillcolor='rgba(204, 204, 204, 0.2)'
     )
     fig2.add_scatter(
         x=df_drias["Année"],
@@ -199,8 +209,8 @@ def plot_climate_strips_tania(
         mode="lines",
         line=dict(width=0),
         fill="tonexty",
+        fillcolor='rgba(204, 204, 204, 0.2)'
     )
-    # fig2.add_bar(x=df['Année'], y=df['ANOM_'+indicateur], name=f'{indicateur} (°C)', marker=dict(color=df_drias[indicateur], coloraxis="coloraxis"))
     fig2.update_layout(coloraxis=dict(colorscale="RdYlBu_r"))
     fig2.update_traces(hovertemplate="Année: %{x}<br>Anomalie: %{y:.1f}°")
 
@@ -209,6 +219,84 @@ def plot_climate_strips_tania(
 
     return fig
 
+
+def temp_max(df):
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].max().reset_index()
+    result.rename(columns={"T_Q": "T_MAX"}, inplace=True)
+    return result
+
+
+def temp_min(df):
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].min().reset_index()
+    result.rename(columns={"T_Q": "T_MIN"}, inplace=True)
+    return result
+
+
+def temp_moyenne(df):  
+    df["Année"] = df["DATE"].dt.year
+    result = df.groupby(["Année"])["T_Q"].min().reset_index()
+    result.rename(columns={"T_Q": "T_MOYENNE"}, inplace=True)
+    return result
+def main_indic_temperature(
+    df_mf,
+    df_drias,
+    indicateur,
+    periode_start,
+    periode_end,
+    dict_indicateurs,
+
+):
+    if indicateur == "T_MAX":
+        temp_function = temp_max
+    elif indicateur =="T_MIN":
+        temp_function = temp_min
+    elif indicateur =="T_MOYENNE":
+        temp_function = temp_moyenne
+    
+    # filtre temporel
+    df_mf_filtre = filtre_temporel_periode(df_mf, periode_start, periode_end)
+    df_drias_filtre = filtre_temporel_periode(df_drias, periode_start, periode_end)
+
+    # filtre  et calcul température minimale par année sur MF
+    df_mf_temp_min = temp_function(df_mf_filtre)
+    val_ref = calcul_val_reference(df_mf_temp_min, indicateur)
+    df_mf_temp_min = calcule_anomalie(df_mf_temp_min, indicateur, val_ref)
+
+    # fitlre et calcul sur DRIAS
+    df_drias_temp_min = temp_function(df_drias_filtre)
+    val_ref_drias = calcul_val_reference(df_drias_temp_min, indicateur)
+    df_drias_temp_min = calcule_anomalie(df_drias_temp_min, indicateur, val_ref_drias)
+
+    # Annomalie et rolling average sur DRIAS
+    df_drias_temp_min["rolling_avg"] = (
+        df_drias_temp_min[indicateur].rolling(window=30).mean() - 15
+    )
+    df_drias_temp_min["rolling_std"] = (
+        df_drias_temp_min[indicateur].rolling(window=30).std()
+    )
+    df_drias_temp_min["avg + std"] = (
+        df_drias_temp_min["rolling_avg"] + df_drias_temp_min["rolling_std"]
+    )
+    df_drias_temp_min["avg - std"] = (
+        df_drias_temp_min["rolling_avg"] - df_drias_temp_min["rolling_std"]
+    )
+    print(df_mf_temp_min.head(5))
+    # Trace
+    fig = plot_climate_strips_tania(
+        df_mf_temp_min,
+        df_drias_temp_min,
+        indicateur,
+        periode_start,
+        periode_end,
+        dict_indicateurs,
+        val_ref,
+        1951,
+        1980,
+    )
+
+    return fig
 
 def calcul_val_reference(df, indic):
     df_periode = df[(df["Année"] >= 1951) & (df["Année"] <= 1980)]
@@ -246,13 +334,11 @@ def main_indic_nb_jour_consecutif(
     # filtre  et calcul nb jour sur MF
     df_mf_nb_jour = calc_nb_j(df_mf_filtre, seuil, signe)
     val_ref = calcul_val_reference(df_mf_nb_jour, indicateur)
-    print(df_mf_nb_jour.head(5))
     df_mf_nb_jour = calcule_anomalie(df_mf_nb_jour, indicateur, val_ref)
 
     # fitlre et calcul sur DRIAS
     df_drias_nb_jour = calc_nb_j(df_drias_filtre, seuil, signe)
     val_ref_drias = calcul_val_reference(df_drias_nb_jour, indicateur)
-    print(df_drias_nb_jour.head(5))
     df_drias_nb_jour = calcule_anomalie(df_drias_nb_jour, indicateur, val_ref_drias)
 
     # Annomalie et rolling average sur DRIAS
@@ -268,7 +354,6 @@ def main_indic_nb_jour_consecutif(
     df_drias_nb_jour["avg - std"] = (
         df_drias_nb_jour["rolling_avg"] - df_drias_nb_jour["rolling_std"]
     )
-    print(df_mf_nb_jour.head(5))
     # Trace
     fig = plot_climate_strips_tania(
         df_mf_nb_jour,
