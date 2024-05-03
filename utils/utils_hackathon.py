@@ -331,6 +331,8 @@ def main_indic_nb_jour_consecutif(
     df_drias_nb_jour["avg - std"] = (
         df_drias_nb_jour["rolling_avg"] - df_drias_nb_jour["rolling_std"]
     )
+    df_mf_nb_jour = df_mf_nb_jour[df_mf_nb_jour["Année"]!=2024]
+
     # Trace
     fig = plot_climate_strip(
         df_mf_nb_jour,
