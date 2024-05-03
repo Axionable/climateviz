@@ -27,6 +27,7 @@ if scenario:
     df_drias = pd.read_csv(f"data/drias_montpellier_{scenario}_df.csv")
     df_drias["T_Q"] = df_drias["T_Q"] - 273.15
     df_mf = pd.read_csv("data/mf_montpellier.csv")
+    print(df_mf.head())
 
 ind = col11.selectbox(
     "Choississez un indicateur",

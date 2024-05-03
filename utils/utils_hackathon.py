@@ -262,6 +262,8 @@ def main_indic_temperature(
     df_drias_temp_min["avg - std"] = (
         df_drias_temp_min["rolling_avg"] - df_drias_temp_min["rolling_std"]
     )
+
+    df_mf_temp_min = df_mf_temp_min[df_mf_temp_min["Année"]!=2024]
     # Trace
     fig = plot_climate_strip(
         df_mf_temp_min,
