@@ -2,7 +2,7 @@ import plotly.express as px
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import plotly.graph_objects as go
-
+from datetime import datetime
 
 def map_commune(commune, latitude, longitude):
     data = {"Latitude": latitude, "Longitude": longitude}
@@ -115,19 +115,26 @@ def plot_climate_strip(
         name=f"{indicateur}",
         marker=dict(color=df[indicateur], coloraxis="coloraxis"),
     )
-    fig.update_traces(
-        hovertemplate="Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°",
-        customdata=df[indicateur],
-    )
+
+    if indicateur == "Nb_jours_max":
+        hovertemplate = "Année: %{{x}}<br>Anomalie: %{{y:.0f}} jours <br>{}: %{{customdata:.0f}}".format(
+                    dict_indicateurs[indicateur]
+                )
+        title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} jours"
+        
+    else : 
+        hovertemplate = "Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°"
+        title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} °C"
 
     fig.update_traces(
-        hovertemplate="Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°",
+        hovertemplate=hovertemplate,
         customdata=df[indicateur],
     )
 
     fig.update_layout(coloraxis=dict(colorscale="RdYlBu_r"), width=1000)
+
     fig.update_layout(
-        title=f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}",
+        title=title,
         xaxis_title="Année",
     )
     if indicateur == "Nb_jours_max":
@@ -268,7 +275,7 @@ def main_indic_temperature(
         1980,
     )
 
-    return fig
+    return fig, df_drias_temp_min
 
 
 
@@ -288,14 +295,13 @@ def calcule_anomalie(df, indicateur, moyenne_ref):
 def main_indic_nb_jour_consecutif(
     df_mf,
     df_drias,
-    indicateur,
     seuil,
     periode_start,
     periode_end,
     dict_indicateurs,
     signe,
 ):
-
+    indicateur = "Nb_jours_max"
     # filtre temporel
     df_mf_filtre = filtre_temporel_periode(df_mf, periode_start, periode_end)
     df_drias_filtre = filtre_temporel_periode(df_drias, periode_start, periode_end)
@@ -336,28 +342,24 @@ def main_indic_nb_jour_consecutif(
         1980,
     )
 
-    return fig
+    return fig,df_drias_nb_jour
 
 
 def prepa_df_metrique(
-    df, ref, periode_start, periode_end, seuil, signe="+", longueur_horizon=15
+    df, ref, indicateur, longueur_horizon=15
 ):
-    df_filtre = filtre_temporel_periode(df, periode_start, periode_end)
-    df_filtre_horizon = calc_nb_j(
-        filter_horizon(df_filtre, reference=ref, longueur_horizon=longueur_horizon),
-        seuil,
-        signe,
-    )
-
-    return int(df_filtre_horizon[df_filtre_horizon.columns[1]].mean())
+    df_filtre_horizon = filter_horizon(df, reference=ref, longueur_horizon=longueur_horizon)
+    print(df_filtre_horizon.head(3))
+    return int(df_filtre_horizon[indicateur].mean())
 
 
 def filter_horizon(df, reference, longueur_horizon=15):
-    reference_date = pd.Timestamp(year=reference, month=1, day=1)
-    date_before = reference_date - pd.DateOffset(years=longueur_horizon)
-    date_after = reference_date + pd.DateOffset(years=longueur_horizon)
-    filtered_df = df[(df["DATE"] >= date_before) & (df["DATE"] <= date_after)]
-    return filtered_df
+    df_filtre = df[(df["Année"]>=reference-15) & (df["Année"]<=reference+15)]
+    # reference_date = pd.Timestamp(year=reference, month=1, day=1)
+    # date_before = reference_date - pd.DateOffset(years=longueur_horizon)
+    # date_after = reference_date + pd.DateOffset(years=longueur_horizon)
+    # filtered_df = df[(df["DATE"] >= date_before) & (df["DATE"] <= date_after)]
+    return df_filtre
 
 
 # Partie Regression
@@ -372,16 +374,7 @@ def create_df_index_var_metier(df_index, df_var_metier):
     return df
 
 
-def load_csv(df_index):
-    uploaded_file = st.file_uploader(
-        "Charger un fichier csv (col1 : variable, col2 : année)"
-    )
-    if uploaded_file is not None:
-        df_var_metier = pd.read_csv(uploaded_file)
-        print("Chargé")
-        # st.write(df_var_metier)
 
-    return create_df_index_var_metier(df_index, df_var_metier)
 
 
 def corr_df(df):
@@ -444,7 +437,6 @@ def plot_reg_temporel(df, regr, df_drias):
 
 
 def main_inspect_csv(df_ind, df_mf, df_drias):
-    # df = load_csv (df_index)
     df = create_df_index_var_metier(df_mf, df_ind)
     corr = corr_df(df)
     # st.write(f"Correlation entre la variable et l'indicateur climatique : \n{}")
@@ -453,3 +445,12 @@ def main_inspect_csv(df_ind, df_mf, df_drias):
     fig1 = plot_reg(df, regr)
     fig2 = plot_reg_temporel(df, regr, df_drias)
     return corr, fig1, fig2
+
+
+def validate_date(date_text):
+    try:
+        # Check if the date is in the correct format
+        datetime.strptime(date_text, "%m-%d")
+        return True
+    except ValueError:
+        return False
