@@ -211,7 +211,7 @@ def temp_min(df):
 
 def temp_moyenne(df):
     df["Année"] = df["DATE"].dt.year
-    result = df.groupby(["Année"])["T_Q"].min().reset_index()
+    result = df.groupby(["Année"])["T_Q"].mean().reset_index()
     result.rename(columns={"T_Q": "T_MOYENNE"}, inplace=True)
     return result
 
