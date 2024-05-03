@@ -27,7 +27,7 @@ if scenario:
     df_drias = pd.read_csv(f"data/drias_montpellier_{scenario}_df.csv")
     df_drias["T_Q"] = df_drias["T_Q"] - 273.15
     df_mf = pd.read_csv("data/mf_montpellier.csv")
-    print(df_mf.head())
+
 
 ind = col11.selectbox(
     "Choississez un indicateur",
@@ -79,7 +79,9 @@ if (
         "Choix seuil",
         ["Température Supérieur", "Température Min"],
     )
-    dict_indicateurs["Nb_jours_max"] = f"Nombre de jours où la température est > à {seuil} °C ",
+    dict_indicateurs["Nb_jours_max"] = (
+        f"Nombre de jours où la température est > à {seuil} °C ",
+    )
     if choix_seuil == "Température Min":
         signe = "-"
         text = f"Nombre de jours qui sous en-dessous  d'une température de {seuil} °C "
@@ -87,8 +89,6 @@ if (
     else:
         signe = "+"
         text = f"Nombre de jours qui dépassent une température de {seuil} °C "
-
-
 
     dict_indicateurs["Nb_jours_max"] = text
 
@@ -132,12 +132,13 @@ if (
 
 if commune and scenario and ind and not error_date:
     # metrique
-    metrique1995 = uh.prepa_df_metrique(df, 1995, ind)
+    metrique2000 = uh.prepa_df_metrique(df, 2000, ind)
     metrique2020 = uh.prepa_df_metrique(df, 2030, ind)
     metrique2050 = uh.prepa_df_metrique(df, 2050, ind)
 
-
-    container = st.expander("Analyse par horizon du " + dict_indicateurs[ind].lower(), expanded=True)
+    container = st.expander(
+        "Analyse par horizon du " + dict_indicateurs[ind].lower(), expanded=True
+    )
     col1, col2, col3 = container.columns(3)
     col1.metric("Horizon 1995", metrique1995)
     col2.metric(

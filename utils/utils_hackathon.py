@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 import plotly.graph_objects as go
 from datetime import datetime
 
+
 def map_commune(commune, latitude, longitude):
     data = {"Latitude": latitude, "Longitude": longitude}
 
@@ -118,12 +119,14 @@ def plot_climate_strip(
 
     if indicateur == "Nb_jours_max":
         hovertemplate = "Année: %{{x}}<br>Anomalie: %{{y:.0f}} jours <br>{}: %{{customdata:.0f}}".format(
-                    dict_indicateurs[indicateur]
-                )
+            dict_indicateurs[indicateur]
+        )
         title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} jours"
-        
-    else : 
-        hovertemplate = "Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°"
+
+    else:
+        hovertemplate = (
+            "Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°"
+        )
         title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} °C"
 
     fig.update_traces(
@@ -216,8 +219,6 @@ def temp_moyenne(df):
     return result
 
 
-
-
 def main_indic_temperature(
     df_mf,
     df_drias,
@@ -232,7 +233,6 @@ def main_indic_temperature(
         temp_function = temp_min
     elif indicateur == "T_MOYENNE":
         temp_function = temp_moyenne
-
 
     # filtre temporel
     df_mf_filtre = filtre_temporel_periode(df_mf, periode_start, periode_end)
@@ -263,7 +263,7 @@ def main_indic_temperature(
         df_drias_temp_min["rolling_avg"] - df_drias_temp_min["rolling_std"]
     )
 
-    df_mf_temp_min = df_mf_temp_min[df_mf_temp_min["Année"]!=2024]
+    df_mf_temp_min = df_mf_temp_min[df_mf_temp_min["Année"] != 2024]
     # Trace
     fig = plot_climate_strip(
         df_mf_temp_min,
@@ -278,7 +278,6 @@ def main_indic_temperature(
     )
 
     return fig, df_drias_temp_min
-
 
 
 def calcul_val_reference(df, indic):
@@ -331,7 +330,7 @@ def main_indic_nb_jour_consecutif(
     df_drias_nb_jour["avg - std"] = (
         df_drias_nb_jour["rolling_avg"] - df_drias_nb_jour["rolling_std"]
     )
-    df_mf_nb_jour = df_mf_nb_jour[df_mf_nb_jour["Année"]!=2024]
+    df_mf_nb_jour = df_mf_nb_jour[df_mf_nb_jour["Année"] != 2024]
 
     # Trace
     fig = plot_climate_strip(
@@ -346,19 +345,19 @@ def main_indic_nb_jour_consecutif(
         1980,
     )
 
-    return fig,df_drias_nb_jour
+    return fig, df_drias_nb_jour
 
 
-def prepa_df_metrique(
-    df, ref, indicateur, longueur_horizon=15
-):
-    df_filtre_horizon = filter_horizon(df, reference=ref, longueur_horizon=longueur_horizon)
+def prepa_df_metrique(df, ref, indicateur, longueur_horizon=15):
+    df_filtre_horizon = filter_horizon(
+        df, reference=ref, longueur_horizon=longueur_horizon
+    )
     print(df_filtre_horizon.head(3))
     return int(df_filtre_horizon[indicateur].mean())
 
 
 def filter_horizon(df, reference, longueur_horizon=15):
-    df_filtre = df[(df["Année"]>=reference-15) & (df["Année"]<=reference+15)]
+    df_filtre = df[(df["Année"] >= reference - 15) & (df["Année"] <= reference + 15)]
     # reference_date = pd.Timestamp(year=reference, month=1, day=1)
     # date_before = reference_date - pd.DateOffset(years=longueur_horizon)
     # date_after = reference_date + pd.DateOffset(years=longueur_horizon)
@@ -376,9 +375,6 @@ def create_df_index_var_metier(df_index, df_var_metier):
     df = df_index.merge(df_var_metier, left_on="DATE", right_on=1)
 
     return df
-
-
-
 
 
 def corr_df(df):
