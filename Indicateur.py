@@ -140,7 +140,7 @@ if commune and scenario and ind and not error_date:
         "Analyse par horizon du " + dict_indicateurs[ind].lower(), expanded=True
     )
     col1, col2, col3 = container.columns(3)
-    col1.metric("Horizon 1995", metrique2000)
+    col1.metric("Horizon 2000", metrique2000)
     col2.metric(
         "Horizon 2020",
         metrique2020,
