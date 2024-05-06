@@ -35,7 +35,7 @@ ind = col11.selectbox(
         "Température Max",
         "Température Moyenne",
         "Température Min",
-        "Température de jours qui dépassent une température seuil",
+        "Nombre de jours qui dépassent une température seuil",
     ],
     index=None,
 )
@@ -67,7 +67,7 @@ dict_indicateurs = {
 
 # Temperature Seuil
 if (
-    ind == "Température de jours qui dépassent une température seuil"
+    ind == "Nombre de jours qui dépassent une température seuil"
     and scenario
     and commune
     and not error_date
@@ -77,12 +77,12 @@ if (
     )
     choix_seuil = col12.radio(
         "Choix seuil",
-        ["Température Supérieur", "Température Min"],
+        ["Température Supérieur", "Température Inférieur"],
     )
     dict_indicateurs["Nb_jours_max"] = (
         f"Nombre de jours où la température est > à {seuil} °C ",
     )
-    if choix_seuil == "Température Min":
+    if choix_seuil == "Température Inférieur":
         signe = "-"
         text = f"Nombre de jours qui sous en-dessous  d'une température de {seuil} °C "
 

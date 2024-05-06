@@ -263,7 +263,9 @@ def main_indic_temperature(
         df_drias_temp_min["rolling_avg"] - df_drias_temp_min["rolling_std"]
     )
 
-    df_mf_temp_min = df_mf_temp_min[df_mf_temp_min["Année"] != 2024]
+    df_mf_temp_min = df_mf_temp_min[
+        (df_mf_temp_min["Année"] != 2024) & (df_mf_temp_min["Année"] != 1958)
+    ]
     # Trace
     fig = plot_climate_strip(
         df_mf_temp_min,
@@ -325,12 +327,15 @@ def main_indic_nb_jour_consecutif(
         df_drias_nb_jour[indicateur].rolling(window=30).std()
     )
     df_drias_nb_jour["avg + std"] = (
-        df_drias_nb_jour["rolling_avg"] + df_drias_nb_jour["rolling_std"]
+        df_drias_nb_jour["rolling_avg"]
+        + df_drias_nb_jour["rolling_std"]  # *(1+(df_drias_nb_jour["Année"]-2000)/50)
     )
     df_drias_nb_jour["avg - std"] = (
         df_drias_nb_jour["rolling_avg"] - df_drias_nb_jour["rolling_std"]
     )
-    df_mf_nb_jour = df_mf_nb_jour[df_mf_nb_jour["Année"] != 2024]
+    df_mf_nb_jour = df_mf_nb_jour[
+        (df_mf_nb_jour["Année"] != 2024) & (df_mf_nb_jour["Année"] != 1958)
+    ]
 
     # Trace
     fig = plot_climate_strip(
