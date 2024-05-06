@@ -90,7 +90,7 @@ if (
         text = f"Nombre de jours qui dépassent une température de {seuil} °C "
 
     dict_indicateurs["Nb_jours_max"] = text
-
+    ind = "Nb_jours_max"
     fig, df_d, df_m = uh.main_indic_nb_jour_consecutif(
         df_mf,
         df_drias,
