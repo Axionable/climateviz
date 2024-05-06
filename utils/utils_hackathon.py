@@ -110,7 +110,6 @@ def plot_climate_strip(
     end_year_ref,
 ):
     fig = go.Figure()
-    print(dict_indicateurs)
     fig.add_bar(
         x=df["Année"],
         y=df["ANOM_" + indicateur],

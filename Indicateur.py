@@ -20,9 +20,7 @@ commune = col11.selectbox(
 )
 if commune:
     c2.plotly_chart(fig2)
-scenario = col12.selectbox(
-    "Scénario Climatique", ["RCP2.6", "RCP4.5", "RCP8.5"], index=None
-)
+scenario = col12.selectbox("Scénario Climatique", ["RCP4.5", "RCP8.5"], index=None)
 if scenario:
     df_drias = pd.read_csv(f"data/drias_montpellier_{scenario}_df.csv")
     df_drias["T_Q"] = df_drias["T_Q"] - 273.15
@@ -77,7 +75,7 @@ if (
     )
     choix_seuil = col12.radio(
         "Choix seuil",
-        ["Température Supérieur", "Température Inférieur"],
+        ["Température Supérieure", "Température Inférieure"],
     )
     dict_indicateurs["Nb_jours_max"] = (
         f"Nombre de jours où la température est > à {seuil} °C ",
@@ -136,9 +134,11 @@ if commune and scenario and ind and not error_date:
     metrique2020 = uh.prepa_df_metrique(df, 2030, ind)
     metrique2050 = uh.prepa_df_metrique(df, 2050, ind)
 
-    container = st.expander(
-        "Analyse par horizon du " + dict_indicateurs[ind].lower(), expanded=True
-    )
+    if "jours" in ind:
+        title = "Analyse par horizon du " + dict_indicateurs[ind].lower()
+    else:
+        title = "Analyse par horizon de la " + dict_indicateurs[ind].lower()
+    container = st.expander(title, expanded=True)
     col1, col2, col3 = container.columns(3)
     col1.metric("Horizon 2000", metrique2000)
     col2.metric(
