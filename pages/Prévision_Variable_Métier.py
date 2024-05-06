@@ -3,7 +3,32 @@ from utils import utils_hackathon as uh
 import pandas as pd
 
 
-st.write("hello")
+st.write("Prévision Variable Métier")
+
+c = st.expander("A propos de cet outil")
+c.markdown("""  
+Cette page a pour objectif d'apporter une visualisation des prévisions d'une variable métier spécifique sur le long terme à l'aide d'un indicateur climatique choisi. 
+
+Vous avez la possibilité de personnaliser l'indicateur climatique sur lequel vous souhaitez baser vos prévisions en sélectionnant le type de scénario climatique ainsi que la fenêtre temporelle. 
+
+Pour utiliser notre outil de prévision, veuillez fournir un fichier CSV contenant des données historiques sur la variable métier. Ce fichier doit comporter une colonne contenant les valeurs de la variable métier ainsi qu'un historique précis sur une plage temporelle donnée (de l'année X à l'année Y) avec une fréquence annuelle.
+
+Nos prévisions sont calculées grâce à l'utilisation conjointe des données climatiques de Météo France et de DRIAS, ainsi que de l'indicateur choisi, en utilisant des modèles de machine learning.
+
+Explorez les différentes options disponibles et obtenez des prévisions personnalisées pour prendre des décisions éclairées dans votre domaine d'activité.
+""")
+
+
+#- **Objectif de l'outil** : L'outil permet aux utilisateurs d'évaluer les risque physiques associés à différents actifs en analysant leurs vulnérabilités et expositions aux aléas climatiques
+#- **Comment ça fonctionne** : Les utilisateurs chargent un fichier excel sur les actifs analysés qui inclut :
+#    - la valeur monétaire
+#    - l'exposition aux aléas climatiques selon plusieurs scénarios climatiques et horizons temporels
+#    - la vulnérabilité des sites  
+#
+#L'exposition et la vulnérabilité permet de déterminer un score d'exposition à un risque physique entre faible et élevé. Les actifs avec un score élevés sont considérés comme à risques.  
+#           
+#- **Données utilisées**: Les analyses sont basées sur une combinaison d'analyse métier (vulnérabilité des sites et valeurs monétaires) et d'indicateurs climatiques (exposition).
+
 
 
 dict_indicateurs = {"T_MAX": "Temperature maximale"}
@@ -125,6 +150,16 @@ if (
     )
 
 
+
+col1, col2 = st.columns(2)
+
+with col1:
+    nom_var_metier = st.text_input("Nom variable métier")
+
+with col2:
+    unite_var_metier = st.text_input("Unité de mesure")
+
+
 uploaded_file = st.file_uploader(
     "Chargez votre fichier CSV avec les données métiers", type=["csv"]
 )
@@ -138,8 +173,18 @@ if uploaded_file is not None:
     df_d = df_d[["Année", "index"]]
 
     df95, df30, df50 = uh.main_inspect_csv(df_metier, df_m, df_d)
-    image = uh.show_box_plot(df95, df30, df50)
-    st.plotly_chart(image)
+
+    col_graphique, col_description = st.columns([2, 1])
+
+    with col_graphique:
+        image = uh.show_box_plot(df95, df30, df50, scenario, nom_var_metier, unite_var_metier)
+        st.plotly_chart(image)
+
+    with col_description:
+        st.write("Information sur le graphique :")
+        st.write(f"Ce graphique représente une visualisation des prévisions de la {nom_var_metier} pour trois horizons générés à partir d'un modèle de machine learning (un arbre de décision) qui se base sur l'indicateur climatique selectionné.")
+        st.write(f"Cette représentation permet de visualiser les variations de la {nom_var_metier} en fonction du scénario climatique {scenario} et de mieux comprendre son impact potentiel sur cette variable spécifique.")
+
     # image.show()
     # corr, fig_reg, fig_temp = uh.main_inspect_csv(df_metier, df_m, df_d)
     # st.plotly_chart(fig_temp)

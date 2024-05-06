@@ -488,7 +488,7 @@ def main_inspect_csv(df_ind, df_mf, df_drias):
     return df_1995, df_2030, df_2050
 
 
-def show_box_plot(df95, df30, df50):
+def show_box_plot(df95, df30, df50, scenario, variable_metier, unite_mesure):
 
     fig = go.Figure()
 
@@ -526,8 +526,8 @@ def show_box_plot(df95, df30, df50):
     )
 
     fig.update_layout(
-        title="Box Plot de la Qualité du vin pour chaque horizon pour le scenario RCP8.5",
-        yaxis_title="Qualité",
+        title=f"Box Plot de la {variable_metier} ({unite_mesure}) pour chaque horizon pour le scenario {scenario}",
+        yaxis_title=f"{variable_metier} ({unite_mesure})",
         xaxis_title="Horizons",
     )
 
