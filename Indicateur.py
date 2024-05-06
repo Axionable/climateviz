@@ -92,7 +92,7 @@ if (
 
     dict_indicateurs["Nb_jours_max"] = text
 
-    fig, df = uh.main_indic_nb_jour_consecutif(
+    fig, df, _ = uh.main_indic_nb_jour_consecutif(
         df_mf,
         df_drias,
         seuil,
@@ -119,7 +119,7 @@ if (
     }
     ind = ind_dict[ind]
 
-    fig, df = uh.main_indic_temperature(
+    fig, df, _ = uh.main_indic_temperature(
         df_mf=df_mf,
         df_drias=df_drias,
         indicateur=ind,

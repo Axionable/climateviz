@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 import plotly.graph_objects as go
 from datetime import datetime
+from sklearn.tree import DecisionTreeClassifier
+
 
 
 def map_commune(commune, latitude, longitude):
@@ -279,8 +281,7 @@ def main_indic_temperature(
         1980,
     )
 
-    return fig, df_drias_temp_min
-
+    return fig, df_drias_temp_min, df_mf_temp_min
 
 def calcul_val_reference(df, indic):
     df_periode = df[(df["Année"] >= 1951) & (df["Année"] <= 1980)]
@@ -350,7 +351,7 @@ def main_indic_nb_jour_consecutif(
         1980,
     )
 
-    return fig, df_drias_nb_jour
+    return fig, df_drias_nb_jour, df_mf_nb_jour
 
 
 def prepa_df_metrique(df, ref, indicateur, longueur_horizon=15):
@@ -362,7 +363,10 @@ def prepa_df_metrique(df, ref, indicateur, longueur_horizon=15):
 
 
 def filter_horizon(df, reference, longueur_horizon=15):
-    df_filtre = df[(df["Année"] >= reference - 15) & (df["Année"] <= reference + 15)]
+    df_filtre = df[
+        (df["Année"] >= reference - longueur_horizon)
+        & (df["Année"] <= reference + longueur_horizon)
+    ]
     # reference_date = pd.Timestamp(year=reference, month=1, day=1)
     # date_before = reference_date - pd.DateOffset(years=longueur_horizon)
     # date_after = reference_date + pd.DateOffset(years=longueur_horizon)
@@ -371,14 +375,12 @@ def filter_horizon(df, reference, longueur_horizon=15):
 
 
 # Partie Regression
-def create_df_index_var_metier(df_index, df_var_metier):
-    df_var_metier.rename(columns={list(df_var_metier)[0]: 0}, inplace=True)
-    df_var_metier.rename(columns={list(df_var_metier)[1]: 1}, inplace=True)
-    df_index.rename(columns={list(df_index)[0]: "DATE"}, inplace=True)
-    df_index.rename(columns={list(df_index)[1]: "index"}, inplace=True)
-
-    df = df_index.merge(df_var_metier, left_on="DATE", right_on=1)
-
+def create_df_index_var_metier(df_m, df_var_metier):
+    df_m.rename(columns={"Année": "DATE"}, inplace=True)
+    df_var_metier.rename(
+        columns={list(df_var_metier)[0]: 0, list(df_var_metier)[1]: 1}, inplace=True
+    )
+    df = df_m.merge(df_var_metier, left_on="DATE", right_on=1)
     return df
 
 
@@ -389,10 +391,29 @@ def corr_df(df):
 def modele_baseline_train(df):
     X, Y, annee = df[["index"]], df[0], df["DATE"]
 
-    regr = LinearRegression()
+    regr = DecisionTreeClassifier()
     regr.fit(X, Y)
 
     return regr
+
+
+def predict(df, model):
+
+    df = df[df["Année"] > 2024]
+    annee_drias = df["Année"]
+
+    df.rename(columns={list(df)[1]: "index"}, inplace=True)
+
+    y_pred = model.predict(df[["index"]])
+
+    return y_pred, annee_drias
+
+
+def create_df_pred(y_pred, annee):
+
+    df_predictions = pd.DataFrame({0: y_pred, 1: annee})
+
+    return df_predictions
 
 
 def plot_reg(df, regr):
@@ -402,13 +423,17 @@ def plot_reg(df, regr):
     X, _, _ = df[["index"]], df[0], df["DATE"]
 
     fig.add_trace(
-        go.Scatter(x=df["index"], y=df[0], mode="markers", name="observations")
+        go.Scatter(x=df["index"], y=df[0], mode="markers", name="Observations")
     )
     fig.add_trace(
-        go.Scatter(x=df["index"], y=y_pred, mode="lines+markers", name="predictions")
+        go.Scatter(x=df["index"], y=y_pred, mode="lines+markers", name="Predictions")
     )
 
-    fig.update_layout(xaxis_title="index climatique", yaxis_title="variable")
+    fig.update_layout(
+        title="Comparaison des Observations et des Prédictions",
+        xaxis_title="Index Climatique",
+        yaxis_title="Variable business",
+    )
     return fig
 
 
@@ -441,15 +466,74 @@ def plot_reg_temporel(df, regr, df_drias):
     return fig
 
 
+# def main_inspect_csv(df_ind, df_mf, df_drias):
+#    df = create_df_index_var_metier(df_mf, df_ind)
+#    corr = corr_df(df)
+#    # st.write(f"Correlation entre la variable et l'indicateur climatique : \n{}")
+#
+#    regr = modele_baseline_train(df)
+#    fig1 = plot_reg(df, regr)
+#    fig2 = plot_reg_temporel(df, regr, df_drias)
+#    return corr, fig1, fig2
+
+
 def main_inspect_csv(df_ind, df_mf, df_drias):
     df = create_df_index_var_metier(df_mf, df_ind)
-    corr = corr_df(df)
-    # st.write(f"Correlation entre la variable et l'indicateur climatique : \n{}")
-
     regr = modele_baseline_train(df)
-    fig1 = plot_reg(df, regr)
-    fig2 = plot_reg_temporel(df, regr, df_drias)
-    return corr, fig1, fig2
+    y_pred, annee_drias = predict(df_drias, regr)
+    df_qualite_pred = create_df_pred(y_pred, annee_drias)
+    df_concat = pd.concat([df_ind, df_qualite_pred], axis=0)
+    df_concat = df_concat.rename(columns={0: "qualite", 1: "Année"})
+    df_1995 = filter_horizon(df_concat, 1995, longueur_horizon=15)
+    df_2030 = filter_horizon(df_concat, 2030, longueur_horizon=15)
+    df_2050 = filter_horizon(df_concat, 2050, longueur_horizon=15)
+    return df_1995, df_2030, df_2050
+
+
+def show_box_plot(df95, df30, df50):
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Box(
+            y=df95["qualite"],
+            name="Horizon 1995",
+            marker=dict(color="blue"),
+            boxmean=True,
+            jitter=0.3,
+            pointpos=-1.8,
+        )
+    )
+
+    fig.add_trace(
+        go.Box(
+            y=df30["qualite"],
+            name="Horizon 2030",
+            marker=dict(color="red"),
+            boxmean=True,
+            jitter=0.3,
+            pointpos=0,
+        )
+    )
+
+    fig.add_trace(
+        go.Box(
+            y=df50["qualite"],
+            name="Horizon 2050",
+            marker=dict(color="green"),
+            boxmean=True,
+            jitter=0.3,
+            pointpos=1.8,
+        )
+    )
+
+    fig.update_layout(
+        title="Box Plot de la Qualité du vin pour chaque horizon pour le scenario RCP8.5",
+        yaxis_title="Qualité",
+        xaxis_title="Horizons",
+    )
+
+    return fig
 
 
 def validate_date(date_text):
