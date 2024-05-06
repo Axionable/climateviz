@@ -6,7 +6,6 @@ from datetime import datetime
 from sklearn.tree import DecisionTreeClassifier
 
 
-
 def map_commune(commune, latitude, longitude):
     data = {"Latitude": latitude, "Longitude": longitude}
 
@@ -111,11 +110,11 @@ def plot_climate_strip(
     end_year_ref,
 ):
     fig = go.Figure()
-
+    print(dict_indicateurs)
     fig.add_bar(
         x=df["Année"],
         y=df["ANOM_" + indicateur],
-        name=f"{indicateur}",
+        name=f"{dict_indicateurs[indicateur]}",
         marker=dict(color=df[indicateur], coloraxis="coloraxis"),
     )
 
@@ -126,8 +125,8 @@ def plot_climate_strip(
         title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} jours"
 
     else:
-        hovertemplate = (
-            "Année: %{x}<br>Anomalie: %{y:.1f}°<br>T_Moyenne: %{customdata}°"
+        hovertemplate = "Année: %{{x}}<br>Anomalie: %{{y:.0f}} jours <br>{}: %{{customdata:.0f}} °C".format(
+            dict_indicateurs[indicateur]
         )
         title = f"{dict_indicateurs[indicateur]} entre le {periode_start} et le {periode_end}.<br>Écart à la moyenne de référence {start_year_ref} à {end_year_ref}. Valeur de référence : {int(moy_ref)} °C"
 
@@ -283,6 +282,7 @@ def main_indic_temperature(
 
     return fig, df_drias_temp_min, df_mf_temp_min
 
+
 def calcul_val_reference(df, indic):
     df_periode = df[(df["Année"] >= 1951) & (df["Année"] <= 1980)]
 
@@ -358,7 +358,6 @@ def prepa_df_metrique(df, ref, indicateur, longueur_horizon=15):
     df_filtre_horizon = filter_horizon(
         df, reference=ref, longueur_horizon=longueur_horizon
     )
-    print(df_filtre_horizon.head(3))
     return int(df_filtre_horizon[indicateur].mean())
 
 
