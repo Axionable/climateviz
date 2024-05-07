@@ -548,7 +548,7 @@ def show_serie_tempo(
     fig.update_layout(
         xaxis_title="Année",
         yaxis_title=f"{indicateur_mf}" + unite_mesure_mf,
-        yaxis2_title=f"{variable_metier}" + unite_mesure_bus,
+        yaxis2_title=f"{variable_metier}" + "("unite_mesure_bus+")",
     )
 
     return fig
