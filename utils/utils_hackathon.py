@@ -541,3 +541,26 @@ def validate_date(date_text):
         return True
     except ValueError:
         return False
+
+
+text_explication_fin = """     
+- **Données brutes collectées :**
+    - Données quotidiennes du modèle de simulation des schémas de surface (Safran - Isba) (pour l’instant uniquement les températures, mais précipitations, humidité et vents envisagés)
+    - Données DRIAS : Projections climatiques régionalisées réalisées dans les laboratoires français de modélisation du climat
+    - Données externes importables via l’interface  
+
+    
+- **Les données sont préparées et traitées afin de permettre la production d’indicateurs personnalisés sur l’historique, selon les scénarios climatiques et sur une période temporelle personnalisée (été, hiver, mois de mars, ..) :**
+    - Température maximal, minimum et moyenne
+    - Nombre de jours dont la température moyenne dépasse un seuil à définir
+    - Nombre de période de jours dont la température moyenne dépasse un seuil à définir
+    - Comparaison et corrélation par rapport aux données externes importés
+
+- **Via une interface web streamlit, il est possible de:**
+    - Importer des données externes utiles pour le métier
+    - Personnaliser les indicateurs (période temporelle, seuil, etc..)
+    - Visualiser les indicateurs sous forme de graphique ou de KPI et de les exporter
+              
+- **Impact envisagé :** 
+    - La solution permet de produire simplement des indicateurs personnalisés sur les données d’historiques météos, les projections climatiques et des données externes**
+    """
