@@ -170,15 +170,17 @@ with col3 :
     uploaded_file = st.file_uploader(
         "Déposez un fichier CSV avec votre indicateur métier à corréler", type=["csv"]
     )
+
 with col4: 
     st.write("\n")
     st.write("Le fichier CSV doit comporter une colonne contenant les valeurs de l'indicateur métier ainsi qu'un historique précis sur une plage temporelle donnée (de l'année X à l'année Y) avec une fréquence annuelle.")
     csv_download_link = st.download_button(
     label="Télécharger un exemple",
     data=uh.download_csv(),
-    file_name='data/qualite_vin.csv',
+    file_name='qualite_vin.csv',
     mime='text/csv'
     )
+
 if uploaded_file is not None:
     df_metier = pd.read_csv(uploaded_file)
     df_m.rename(columns={ind: "index"}, inplace=True)
@@ -218,7 +220,10 @@ Via une interface web streamlit, il est possible de:
 - importer des données externes utiles pour le métier
 - Personnaliser les indicateurs (période temporelle, seuil, etc..)
 - Visualiser les indicateurs sous forme de graphique ou de KPI et de les exporter
-Impact envisagé	La solution permet de produire simplement des indicateurs personnalisés sur les données d’historiques météos, les projections climatiques et des données externes""")
+
+Impact envisagé	
+
+La solution permet de produire simplement des indicateurs personnalisés sur les données d’historiques météos, les projections climatiques et des données externes""")
 
 
 # if ind == "Température Seuil":
