@@ -2,15 +2,14 @@ import streamlit as st
 from utils import utils_hackathon as uh
 import pandas as pd
 
-
-st.write("hello")
-
+st.set_page_config(layout="wide")
+st.title("Climate Viz by Axionable - Espace de démo")
 
 dict_indicateurs = {"T_MAX": "Temperature maximale"}
 c1, c2 = st.columns(2)
 error_date = False
 
-ctn = c1.expander("Paramètre")
+ctn = c1.expander("Mon indicateur climatique à corréler")
 col11, col12 = ctn.columns(2)
 
 
@@ -100,7 +99,12 @@ if (
         dict_indicateurs,
         signe,
     )
-
+body = ("""
+        Vous souhaitez mesurer l’impact du climat (et donc du changement climatique) sur votre activité ?   
+        Mesurer la corrélation entre un indicateur climatique et un indicateur métier de votre choix, et obtenez une première estimation de l’impact du changement climatique sur votre activité
+        """
+        )
+st.info(body, icon="ℹ️")
 # Construction indicateurr temp moy, max, min
 if (
     ind in ["Température Max", "Température Moyenne", "Température Min"]
@@ -126,7 +130,7 @@ if (
 
 
 uploaded_file = st.file_uploader(
-    "Chargez votre fichier CSV avec les données métiers", type=["csv"]
+    "Déposez un CSV avec votre indicateur métier à corréler", type=["csv"]
 )
 
 if uploaded_file is not None:
@@ -168,3 +172,6 @@ if uploaded_file is not None:
 #        corr, fig_reg, fig_temp = uh.main_inspect_csv(df_millesime, df_mf, df_drias)
 #        st.plotly_chart(fig_reg)
 #        st.plotly_chart(fig_temp)#
+
+exp3 = st.expander("Plus d'info sur notre outil")
+exp3.markdown(uh.text_explication_fin)

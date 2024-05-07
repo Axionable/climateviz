@@ -5,10 +5,21 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
-st.title("Hello Météo-France, bienvenue sur Climate Viz")
+st.title("Climate Viz by Axionable - Espace de démo")
+
+c = st.expander("A propos de cet outil")
+c.markdown(
+    """     
+Le module ClimateViz fait partie de la plateforme SWITCH by Axionable, et vous permet de visualiser l’évolution de vos KPIs climatiques à l’aide de l’état de l’art de la donnée Open Source.
+
+Attention : cet espace est un espace de démonstration seulement
+"""
+)
+
+
 dict_indicateurs = {"T_MAX": "Temperature maximale"}
 c1, c2 = st.columns(2)
-ctn = c1.expander("Paramètre")
+ctn = c1.expander("Paramétrez votre indicateur")
 col11, col12 = ctn.columns(2)
 error_date = False
 # definition des parametres initaux
@@ -37,7 +48,9 @@ ind = col11.selectbox(
     ],
     index=None,
 )
-date_perso = col11.checkbox("Date Personnalisée")
+date_perso = col11.checkbox(
+    "Je souhaite personnaliser la période considérée pour mon indicateur"
+)
 
 # default date
 periode_start = "01-01"
@@ -45,7 +58,7 @@ periode_end = "12-31"
 
 # selection date
 if date_perso:
-    exc1 = c1.expander("Sélection Date Personnalisée")
+    exc1 = c1.expander("Choisissez votre période de l’année")
     exc11, exc12 = exc1.columns(2)
     periode_start = exc11.text_input("Date de Départ", "01-01")
     periode_end = exc12.text_input("Date de Fin", "12-31")
@@ -125,9 +138,20 @@ if (
         periode_end=periode_end,
         dict_indicateurs=dict_indicateurs,
     )
-    metrique_sup = "° C"
+    metrique_sup = " °C"
     st.plotly_chart(fig)
-
+try:
+    if fig:
+        exp2 = st.expander("A propos du graphique")
+        exp2.markdown(
+            """     
+    - Le barplot correspond à l’écart par rapport à l’historique dans l’historique de température (données Météo France).
+    - Le trait vert correspond à l’évolution du KPI selon les données de projection climatique DRIAS. Cette ligne correspond à une moyenne glissante de fenêtre 30ans. 
+    - L’enveloppe grise sert à caractériser l’incertitude liée aux modèles.
+        """
+        )
+except:
+    pass
 if commune and scenario and ind and not error_date:
     # metrique
     metrique2000 = uh.prepa_df_metrique(df, 2000, ind)
@@ -135,19 +159,23 @@ if commune and scenario and ind and not error_date:
     metrique2050 = uh.prepa_df_metrique(df, 2050, ind)
 
     if "jours" in ind:
-        title = "Analyse par horizon du " + dict_indicateurs[ind].lower()
+        title = "Evolution du " + dict_indicateurs[ind].lower() + "par horizon de temps"
     else:
-        title = "Analyse par horizon de la " + dict_indicateurs[ind].lower()
+        title = "Evolution " + dict_indicateurs[ind].lower() + "par horizon de temps"
     container = st.expander(title, expanded=True)
     col1, col2, col3 = container.columns(3)
-    col1.metric("Horizon 2000", metrique2000)
+    # pour le moment données DRIAS !!!
+    col1.metric("Climat 2000 (données Météo France)", str(metrique2000) + metrique_sup)
     col2.metric(
-        "Horizon 2020",
-        metrique2020,
-        str(metrique2020 - metrique2000) + metrique_sup,
+        "Climat 2030 (données Drias)",
+        str(metrique2020) + metrique_sup,
+        str(metrique2020 - metrique2000) + metrique_sup + " vs Climat 2000",
     )
     col3.metric(
-        "Horizon 2050",
-        metrique2050,
-        str(metrique2050 - metrique2000) + metrique_sup,
+        "Climat 2050 (données Drias)",
+        str(metrique2050) + metrique_sup,
+        str(metrique2050 - metrique2000) + metrique_sup + " vs Climat 2000",
     )
+
+exp3 = st.expander("Plus d'info sur notre outil")
+exp3.markdown(uh.text_explication_fin)
