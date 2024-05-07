@@ -2,21 +2,26 @@ import streamlit as st
 from utils import utils_hackathon as uh
 import pandas as pd
 
+st.set_page_config(page_title="Mon Application Streamlit", layout="wide")
 
-st.write("Prévision Variable Métier")
+st.title("ClimateViz by Axionable - Espace de démo")
 
 c = st.expander("A propos de cet outil")
-c.markdown("""  
-Cette page a pour objectif d'apporter une visualisation des prévisions d'une variable métier spécifique sur le long terme à l'aide d'un indicateur climatique choisi. 
+st.write("""  
 
-Vous avez la possibilité de personnaliser l'indicateur climatique sur lequel vous souhaitez baser vos prévisions en sélectionnant le type de scénario climatique ainsi que la fenêtre temporelle. 
+Vous souhaitez mesurer l’impact du climat (et donc du changement climatique) sur votre activité ? Mesurer la corrélation entre l’indicateur climatique de votre choix et un indicateur métier de votre choix, et obtenez une première estimation de l’impact du changement climatique sur votre activité.
 
-Pour utiliser notre outil de prévision, veuillez fournir un fichier CSV contenant des données historiques sur la variable métier. Ce fichier doit comporter une colonne contenant les valeurs de la variable métier ainsi qu'un historique précis sur une plage temporelle donnée (de l'année X à l'année Y) avec une fréquence annuelle.
-
-Nos prévisions sont calculées grâce à l'utilisation conjointe des données climatiques de Météo France et de DRIAS, ainsi que de l'indicateur choisi, en utilisant des modèles de machine learning.
-
-Explorez les différentes options disponibles et obtenez des prévisions personnalisées pour prendre des décisions éclairées dans votre domaine d'activité.
 """)
+#Cette page a pour objectif d'apporter une visualisation des prévisions d'une variable métier spécifique sur le long terme à l'aide d'un indicateur climatique choisi. 
+#
+#Vous avez la possibilité de personnaliser l'indicateur climatique sur lequel vous souhaitez baser vos prévisions en sélectionnant le type de scénario climatique ainsi que la fenêtre temporelle. 
+#
+#Pour utiliser notre outil de prévision, veuillez fournir un fichier CSV contenant des données historiques sur la variable métier. Ce fichier doit comporter une colonne contenant les valeurs de la variable métier ainsi qu'un historique précis sur une plage temporelle donnée (de l'année X à l'année Y) avec une fréquence annuelle.
+#
+#Nos prévisions sont calculées grâce à l'utilisation conjointe des données climatiques de Météo France et de DRIAS, ainsi que de l'indicateur choisi, en utilisant des modèles de machine learning.
+#
+#Explorez les différentes options disponibles et obtenez des prévisions personnalisées pour prendre des décisions éclairées dans votre domaine d'activité.
+#""")
 
 
 #- **Objectif de l'outil** : L'outil permet aux utilisateurs d'évaluer les risque physiques associés à différents actifs en analysant leurs vulnérabilités et expositions aux aléas climatiques
@@ -35,7 +40,7 @@ dict_indicateurs = {"T_MAX": "Temperature maximale"}
 c1, c2 = st.columns(2)
 error_date = False
 
-ctn = c1.expander("Paramètre")
+ctn = c1.expander("Mon indicateur climatique à corréler")
 col11, col12 = ctn.columns(2)
 
 
@@ -154,16 +159,26 @@ if (
 col1, col2 = st.columns(2)
 
 with col1:
-    nom_var_metier = st.text_input("Nom variable métier")
+    nom_var_metier = st.text_input("Nom indicateur métier")
 
 with col2:
     unite_var_metier = st.text_input("Unité de mesure")
 
 
-uploaded_file = st.file_uploader(
-    "Chargez votre fichier CSV avec les données métiers", type=["csv"]
-)
-
+col3, col4 = st.columns(2)
+with col3 :
+    uploaded_file = st.file_uploader(
+        "Déposez un fichier CSV avec votre indicateur métier à corréler", type=["csv"]
+    )
+with col4: 
+    st.write("\n")
+    st.write("Le fichier CSV doit comporter une colonne contenant les valeurs de l'indicateur métier ainsi qu'un historique précis sur une plage temporelle donnée (de l'année X à l'année Y) avec une fréquence annuelle.")
+    csv_download_link = st.download_button(
+    label="Télécharger un exemple",
+    data=uh.download_csv(),
+    file_name='data/qualite_vin.csv',
+    mime='text/csv'
+    )
 if uploaded_file is not None:
     df_metier = pd.read_csv(uploaded_file)
     df_m.rename(columns={ind: "index"}, inplace=True)
@@ -185,9 +200,25 @@ if uploaded_file is not None:
         st.write(f"Ce graphique représente une visualisation des prévisions de la {nom_var_metier} pour trois horizons générés à partir d'un modèle de machine learning (un arbre de décision) qui se base sur l'indicateur climatique selectionné.")
         st.write(f"Cette représentation permet de visualiser les variations de la {nom_var_metier} en fonction du scénario climatique {scenario} et de mieux comprendre son impact potentiel sur cette variable spécifique.")
 
-    # image.show()
-    # corr, fig_reg, fig_temp = uh.main_inspect_csv(df_metier, df_m, df_d)
-    # st.plotly_chart(fig_temp)
+    
+c = st.expander("A propos de ce site")
+
+c.markdown("""Données brutes collectées :
+- Données quotidiennes du modèle de simulation des schémas de surface (Safran - Isba) (pour l’instant uniquement les températures, mais précipitations, humidité et vents envisagés)
+- Données DRIAS : Projections climatiques régionalisées réalisées dans les laboratoires français de modélisation du climat
+- Données externes importables via l’interface
+
+Les données sont préparées et traitées afin de permettre la production d’indicateurs personnalisés sur l’historique, selon les scénarios climatiques et sur une période temporelle personnalisée (été, hiver, mois de mars, ..) :
+- Température maximal, minimum et moyenne
+- Nombre de jours dont la température moyenne dépasse un seuil à définir
+- Nombre de période de jours dont la température moyenne dépasse un seuil à définir
+- Comparaison et corrélation par rapport aux données externes importés
+
+Via une interface web streamlit, il est possible de:
+- importer des données externes utiles pour le métier
+- Personnaliser les indicateurs (période temporelle, seuil, etc..)
+- Visualiser les indicateurs sous forme de graphique ou de KPI et de les exporter
+Impact envisagé	La solution permet de produire simplement des indicateurs personnalisés sur les données d’historiques météos, les projections climatiques et des données externes""")
 
 
 # if ind == "Température Seuil":

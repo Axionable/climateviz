@@ -541,3 +541,12 @@ def validate_date(date_text):
         return True
     except ValueError:
         return False
+
+def load_data():
+    return pd.read_csv("data/qualite_vin.csv")
+
+data = load_data()
+
+def download_csv():
+    csv = data.to_csv(index=False)
+    return csv
