@@ -198,7 +198,8 @@ if uploaded_file is not None:
 
 
     col_graphique, col_description = st.columns([2, 1])
-    
+    corr = uh.compute_correlation(df_m, df_metier)
+        
     with col_graphique:
         image1 = uh.show_serie_tempo(df_metier, df_m, nom_var_metier, " °C", "Note", dict_indicateurs[ind])
         st.plotly_chart(image1)
@@ -212,12 +213,17 @@ if uploaded_file is not None:
 
     with col_description:
         st.write("Information sur le graphique :")
+        
         st.write(f"Ce graphique représente une visualisation de l'évolution de {nom_var_metier} et {nom_indi_mf.lower()} en fonction des années")
-    st.markdown("---")
+        st.write(f"La corrélation entre l'indicateur sélectionné et la variable métier est de {int(corr*100)} %")
+        st.caption("Corrélation : Mesure statistique qui exprime comment deux variables sont liées. Ici, le coefficient linéaire de Pearson a été utilisé.")
+
+    st.markdown("---"   )
     col_graphique, col_description = st.columns([2, 1])
 
     with col_graphique:
         image = uh.show_box_plot(df95, df30, df50, scenario, nom_var_metier, unite_var_metier)
+
         st.plotly_chart(image)
 
     with col_description:

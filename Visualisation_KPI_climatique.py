@@ -70,7 +70,7 @@ if date_perso:
             error_date = False
 
 dict_indicateurs = {
-    "T_MAX": "Temperature maximale",
+    "T_MAX": "Température maximale",
     "T_MIN": "Température minimale",
     "T_MOYENNE": "Température moyenne",
     "nb_episodes": "Nombre d'épisodes",

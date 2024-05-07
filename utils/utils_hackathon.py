@@ -642,3 +642,9 @@ data = load_data()
 def download_csv():
     csv = data.to_csv(index=False)
     return csv
+
+def compute_correlation(df_indicateur, df_metier):
+    df_merge = df_indicateur.merge(df_metier, on = "Année")
+    res = df_merge.corr()
+    correlation = res.loc["var_buis", "index"]
+    return correlation
