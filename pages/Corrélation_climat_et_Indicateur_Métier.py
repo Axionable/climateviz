@@ -215,10 +215,11 @@ if uploaded_file is not None:
         st.write("Information sur le graphique :")
         
         st.write(f"Ce graphique représente une visualisation de l'évolution de {nom_var_metier} et {nom_indi_mf.lower()} en fonction des années")
-        st.write(f"La corrélation entre l'indicateur sélectionné et la variable métier est de {int(corr*100)} %")
+        st.info(f"La corrélation entre l'indicateur sélectionné et la variable métier est de **{int(corr*100)}** %", icon="📈")
+        #st.metric("Corrélation entre l'indicateur sélectionné et la variable métier", str(int(corr*100))+"%")
         st.caption("Corrélation : Mesure statistique qui exprime comment deux variables sont liées. Ici, le coefficient linéaire de Pearson a été utilisé.")
 
-    st.markdown("---"   )
+    st.markdown("---")
     col_graphique, col_description = st.columns([2, 1])
 
     with col_graphique:
