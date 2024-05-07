@@ -2,7 +2,7 @@ import streamlit as st
 from utils import utils_hackathon as uh
 import pandas as pd
 
-st.set_page_config(page_title="ClimateViz by Axionable - Espace de démo", layout="wide")
+st.set_page_config(page_title="ClimateViz by Axionable", layout="wide")
 
 st.title("ClimateViz by Axionable - Espace de démo")
 
@@ -50,7 +50,7 @@ commune = col11.selectbox(
     index=None,
 )
 scenario = col12.selectbox(
-    "Scénario Climatique", ["Scénario", "RCP2.6", "RCP4.5", "RCP8.5"], index=None
+    "Scénario Climatique", [ "RCP4.5", "RCP8.5"], index=None
 )
 if scenario:
     df_drias = pd.read_csv(f"data/drias_montpellier_{scenario}_df.csv")
@@ -68,8 +68,9 @@ ind = col11.selectbox(
     ],
     index=None,
 )
-date_perso = col11.checkbox("Date Personnalisée")
-
+date_perso = col11.checkbox(
+    "Je souhaite personnaliser la période considérée pour mon indicateur"
+)
 # default date
 periode_start = "01-01"
 periode_end = "12-31"
@@ -106,12 +107,12 @@ if (
     )
     choix_seuil = col12.radio(
         "Choix seuil",
-        ["Température Supérieur", "Température Min"],
+        ["Température Supérieure", "Température Inférieure"],
     )
     dict_indicateurs["Nb_jours_max"] = (
         f"Nombre de jours où la température est > à {seuil} °C ",
     )
-    if choix_seuil == "Température Min":
+    if choix_seuil == "Température Inférieure":
         signe = "-"
         text = f"Nombre de jours qui sous en-dessous  d'une température de {seuil} °C "
 

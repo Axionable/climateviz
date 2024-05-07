@@ -93,7 +93,7 @@ if (
     dict_indicateurs["Nb_jours_max"] = (
         f"Nombre de jours où la température est > à {seuil} °C ",
     )
-    if choix_seuil == "Température Inférieur":
+    if choix_seuil == "Température Inférieure":
         signe = "-"
         text = f"Nombre de jours qui sous en-dessous  d'une température de {seuil} °C "
 

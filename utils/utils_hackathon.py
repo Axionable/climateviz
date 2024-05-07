@@ -519,7 +519,7 @@ def show_serie_tempo(
     ## Personnalisation des légendes
     fig.update_layout(
         title={
-            "text": f"Evolution de la {indicateur_mf} et de la {variable_metier} en fonction du temps."
+            "text": f"Evolution de la {indicateur_mf.lower()} et de la {variable_metier.lower()} en fonction du temps."
         },
         legend=dict(
             title="Légende",
