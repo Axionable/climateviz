@@ -3,7 +3,7 @@ from utils import utils_hackathon as uh
 import pandas as pd
 
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="ClimateViz by Axionable", layout="wide")
 
 st.title("Climate Viz by Axionable - Espace de démo")
 
