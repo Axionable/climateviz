@@ -26,9 +26,7 @@ error_date = False
 fig2 = uh.map_commune("Montpellier", [43.61361315241169], [3.875541887925083])
 end_day = False
 
-commune = col11.selectbox(
-    "Choississez votre commune", ["Marseille", "Montpellier", "Niort"], index=None
-)
+commune = col11.selectbox("Choississez votre commune", ["Montpellier"], index=None)
 if commune:
     c2.plotly_chart(fig2)
 scenario = col12.selectbox("Scénario Climatique", ["RCP4.5", "RCP8.5"], index=None)
