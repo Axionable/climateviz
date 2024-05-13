@@ -201,7 +201,7 @@ if uploaded_file is not None:
 
     with col_graphique:
         image1 = uh.show_serie_tempo(
-            df_metier, df_m, nom_var_metier, " °C", "Note", dict_indicateurs[ind]
+            df_metier, df_m, nom_var_metier, " °C", str(unite_var_metier), dict_indicateurs[ind]
         )
         st.plotly_chart(image1)
 
