@@ -93,7 +93,7 @@ if (
     )
     if choix_seuil == "Température Inférieure":
         signe = "-"
-        text = f"Nombre de jours qui sous en-dessous  d'une température de {seuil} °C "
+        text = f"Nombre de jours qui sont en-dessous d'une température de {seuil} °C "
 
     else:
         signe = "+"
