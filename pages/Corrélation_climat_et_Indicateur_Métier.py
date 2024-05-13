@@ -10,7 +10,7 @@ c = st.expander("A propos de cet outil")
 st.write(
     """  
 
-Vous souhaitez mesurer l’impact du climat (et donc du changement climatique) sur votre activité ? Mesurer la corrélation entre l’indicateur climatique de votre choix et un indicateur métier de votre choix, et obtenez une première estimation de l’impact du changement climatique sur votre activité.
+Vous souhaitez mesurer l’impact du climat (et donc du changement climatique) sur votre activité ? Mesurez la corrélation entre l’indicateur climatique de votre choix et un indicateur métier de votre choix et obtenez une première estimation de l’impact du changement climatique sur votre activité.
 
 """
 )
@@ -201,7 +201,12 @@ if uploaded_file is not None:
 
     with col_graphique:
         image1 = uh.show_serie_tempo(
-            df_metier, df_m, nom_var_metier, " °C", str(unite_var_metier), dict_indicateurs[ind]
+            df_metier,
+            df_m,
+            nom_var_metier,
+            " °C",
+            str(unite_var_metier),
+            dict_indicateurs[ind],
         )
         st.plotly_chart(image1)
 

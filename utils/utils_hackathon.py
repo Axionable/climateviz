@@ -482,10 +482,10 @@ def main_inspect_csv(df_ind, df_mf, df_drias):
     df_qualite_pred = create_df_pred(y_pred, annee_drias)
     df_concat = pd.concat([df_ind, df_qualite_pred], axis=0)
     df_concat = df_concat.rename(columns={0: "qualite", 1: "Année"})
-    df_1995 = filter_horizon(df_concat, 1995, longueur_horizon=15)
+    df_2000 = filter_horizon(df_concat, 2000, longueur_horizon=15)
     df_2030 = filter_horizon(df_concat, 2030, longueur_horizon=15)
     df_2050 = filter_horizon(df_concat, 2050, longueur_horizon=15)
-    return df_1995, df_2030, df_2050
+    return df_2000, df_2030, df_2050
 
 
 def show_serie_tempo(
@@ -561,7 +561,7 @@ def show_box_plot(df95, df30, df50, scenario, variable_metier, unite_mesure):
     fig.add_trace(
         go.Box(
             y=df95["qualite"],
-            name="Horizon 1995",
+            name="Horizon 2000",
             marker=dict(color="blue"),
             boxmean=True,
             jitter=0.3,
@@ -611,7 +611,7 @@ def validate_date(date_text):
 
 text_explication_fin = """     
 - **Données brutes collectées :**
-    - Données quotidiennes du modèle de simulation des schémas de surface (Safran - Isba) (pour l’instant uniquement les températures, mais précipitations, humidité et vents envisagés)
+    - Données Météo-France : Données quotidiennes du modèle de simulation des schémas de surface (Safran - Isba) (pour l’instant uniquement les températures, mais précipitations, humidité et vents envisagés)
     - Données DRIAS : Projections climatiques régionalisées réalisées dans les laboratoires français de modélisation du climat
     - Données externes importables via l’interface  
 
