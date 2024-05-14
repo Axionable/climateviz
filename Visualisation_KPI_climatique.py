@@ -12,7 +12,7 @@ c.markdown(
     """     
 Le module ClimateViz fait partie de la plateforme SWITCH by Axionable, et vous permet de visualiser l’évolution de vos KPIs climatiques à l’aide de l’état de l’art de la donnée Open Source.
 
-Attention : cet espace est un espace de démonstration seulement
+Attention : cet espace est l'espace PRO de test d'authentification. 
 """
 )
 
