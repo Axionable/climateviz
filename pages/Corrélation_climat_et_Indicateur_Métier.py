@@ -2,9 +2,8 @@ import streamlit as st
 from utils import utils_hackathon as uh
 import pandas as pd
 
-st.set_page_config(page_title="ClimateViz by Axionable", layout="wide")
-
-st.title("ClimateViz by Axionable - Espace de démo")
+st.set_page_config(page_title="ClimateViz PRO by Axionable", layout="wide")
+st.title("ClimateViz PRO by Axionable")
 
 c = st.expander("A propos de cet outil")
 st.write(

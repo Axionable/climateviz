@@ -5,7 +5,7 @@ import pandas as pd
 
 st.set_page_config(page_title="ClimateViz PRO by Axionable", layout="wide")
 
-st.title("Climate Viz by Axionable - Espace de démo")
+st.title("ClimateViz PRO by Axionable")
 
 c = st.expander("A propos de cet outil")
 c.markdown(
